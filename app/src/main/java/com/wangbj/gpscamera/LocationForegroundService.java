@@ -11,6 +11,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
+import android.location.GpsSatellite;
+import android.location.GpsStatus;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Binder;
@@ -24,6 +26,7 @@ import android.util.Log;
 import com.wangbj.gpscamera.utils.ACache;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Map;
 
 import androidx.core.app.ActivityCompat;
@@ -38,8 +41,10 @@ public class LocationForegroundService extends Service {
     private static final String TAG = "ForegroundService";
     private LocalBinder localBinder = new LocalBinder();
     private NotificationChannel channel;
-    private LocationListener locationListener = new LocationListener(LocationManager.NETWORK_PROVIDER);
-    ACache aCache;
+    private LocationListener locationListener = new LocationListener(LocationManager.GPS_PROVIDER);
+    private GpsListener gpsListener = new GpsListener();
+    private LocationManager locationManager;
+    private ACache aCache;
 
     @Override
     public void onCreate() {
@@ -55,20 +60,21 @@ public class LocationForegroundService extends Service {
     }
 
     public Location gps() {
-        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         Location location = null;
         //不加这段话会导致下面爆红,（这个俗称版本压制，哈哈哈哈哈哈）
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return null;
         }
-        if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {//是否支持Network定位
-            //获取最后的network定位信息
-            location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-
-        }
+//        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {//是否支持Network定位
+//            //获取最后的network定位信息
+//            location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+//
+//        }
         //网络获取定位为空时，每隔1秒请求一次
         if (location == null) {
-            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 1, locationListener);
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0.1f, locationListener);
+            locationManager.addGpsStatusListener(gpsListener);
         }
 
         return location;
@@ -121,12 +127,54 @@ public class LocationForegroundService extends Service {
          * 当前位置
          */
         void onLocation(Location location);
+
+        void onGpsStatue(int status);
+
+        void onGpsChanged(int count);
     }
 
     private LocationCallback mLocationCallback;
 
     public void setLocationCallback(LocationCallback mLocationCallback) {
         this.mLocationCallback = mLocationCallback;
+
+    }
+
+    private class GpsListener implements android.location.GpsStatus.Listener{
+        @Override
+        public void onGpsStatusChanged(int event) {
+            switch (event) {
+                //第一次定位
+                case GpsStatus.GPS_EVENT_FIRST_FIX:
+                    Log.i(TAG, "第一次定位");
+                    break;
+                //卫星状态改变
+                case GpsStatus.GPS_EVENT_SATELLITE_STATUS:
+                    Log.i(TAG, "卫星状态改变");
+                    //获取当前状态
+                    GpsStatus gpsStatus=locationManager.getGpsStatus(null);
+                    //获取卫星颗数的默认最大值
+                    int maxSatellites = gpsStatus.getMaxSatellites();
+                    //创建一个迭代器保存所有卫星
+                    Iterator<GpsSatellite> iters = gpsStatus.getSatellites().iterator();
+                    int count = 0;
+                    while (iters.hasNext() && count <= maxSatellites) {
+                        GpsSatellite s = iters.next();
+                        count++;
+                    }
+                    System.out.println("搜索到："+count+"颗卫星");
+                    mLocationCallback.onGpsChanged(count);
+                    break;
+                //定位启动
+                case GpsStatus.GPS_EVENT_STARTED:
+                    Log.i(TAG, "定位启动");
+                    break;
+                //定位结束
+                case GpsStatus.GPS_EVENT_STOPPED:
+                    Log.i(TAG, "定位结束");
+                    break;
+            }
+        }
     }
 
     private class LocationListener implements android.location.LocationListener {
@@ -159,19 +207,22 @@ public class LocationForegroundService extends Service {
 
         @Override
         public void onStatusChanged(String provider, int status, Bundle extras) {
-
+            mLocationCallback.onGpsStatue(status);
+            Log.e(TAG,"onStatusChanged");
         }
 
         @Override
         public void onProviderEnabled(String provider) {
-
+            Log.e(TAG,"onProviderEnabled");
         }
 
         @Override
         public void onProviderDisabled(String provider) {
-
+            Log.e(TAG,"onProviderEnabled");
         }
     }
+
+
 
     @Override
     public void onDestroy() {

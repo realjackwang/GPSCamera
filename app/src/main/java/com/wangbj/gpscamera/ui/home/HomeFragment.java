@@ -13,6 +13,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.location.LocationProvider;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -56,7 +57,7 @@ public class HomeFragment extends Fragment {
     private LocationManager lm;
     private TextView txt;
     private ListView listView;
-
+    private TextView statelite;
     private boolean isbind;
     private ServiceConnection connection;
 
@@ -68,21 +69,25 @@ public class HomeFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              final ViewGroup container, Bundle savedInstanceState) {
-        homeViewModel =
-                ViewModelProviders.of(this).get(HomeViewModel.class);
+//        homeViewModel =
+//                ViewModelProviders.of(this).get(HomeViewModel.class);
         View root = inflater.inflate(R.layout.fragment_home, container, false);
-        final TextView textView = root.findViewById(R.id.text_home);
-        homeViewModel.getText().observe(this, new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-                textView.setText(s);
-            }
-        });
+//        final TextView textView = root.findViewById(R.id.text_home);
+//        homeViewModel.getText().observe(this, new Observer<String>() {
+//            @Override
+//            public void onChanged(@Nullable String s) {
+//                textView.setText(s);
+//            }
+//        });
 
         context = getContext();
         Button button = root.findViewById(R.id.button);
         Button button1 = root.findViewById(R.id.button2);
+        Button button2 = root.findViewById(R.id.button3);
+        Button button3 = root.findViewById(R.id.button4);
+
         txt = root.findViewById(R.id.tv_show);
+        statelite = root.findViewById(R.id.textView2);
         listView = root.findViewById(R.id.listview);
         final ProgressBar progressBar = root.findViewById(R.id.progressBar);
 
@@ -102,7 +107,7 @@ public class HomeFragment extends Fragment {
                     arrayAdapter.notifyDataSetChanged();
                     txt.setText("经度" + location.getLatitude() + "  纬度:" + location.getLongitude());
                 } else {
-                    txt.setText("无法获取地理位置1111");
+                    txt.setText("正在寻找GPS卫星");
                 }
 
                 locationForegroundService.setLocationCallback(new LocationForegroundService.LocationCallback() {
@@ -113,9 +118,37 @@ public class HomeFragment extends Fragment {
                             arrayAdapter.notifyDataSetChanged();
                             txt.setText("经度" + location.getLatitude() + "  纬度:" + location.getLongitude());
                         } else {
-                            txt.setText("无法获取地理位置2222");
+                            txt.setText("GPS卫星寻找失败");
                         }
                     }
+
+                    @Override
+                    public void onGpsStatue(int status) {
+
+                        switch (status) {
+                            //GPS状态为可见时
+                            case LocationProvider.AVAILABLE:
+                                Toast.makeText(context, "当前GPS状态为可见状态", Toast.LENGTH_SHORT).show();
+                                break;
+                            //GPS状态为服务区外时
+                            case LocationProvider.OUT_OF_SERVICE:
+                                Toast.makeText(context, "当前GPS状态为服务区外状态", Toast.LENGTH_SHORT).show();
+                                break;
+                            //GPS状态为暂停服务时
+                            case LocationProvider.TEMPORARILY_UNAVAILABLE:
+                                Toast.makeText(context, "当前GPS状态为暂停服务状态", Toast.LENGTH_SHORT).show();
+                                break;
+                        }
+
+
+                    }
+
+                    @Override
+                    public void onGpsChanged(int count) {
+                        statelite.setText("卫星数："+count);
+                    }
+
+
                 });
             }
 
@@ -128,7 +161,6 @@ public class HomeFragment extends Fragment {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getLocation(v);
                 TestService.test();
             }
         });
@@ -138,7 +170,6 @@ public class HomeFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 String url = "http://192.168.137.1:5000/file/test.zip";
-
                 DownloadService.download(url, new DownloadService.OnDownloadListener() {
                     @Override
                     public void onDownloadSuccess(final File file) {
@@ -185,6 +216,20 @@ public class HomeFragment extends Fragment {
 
                     }
                 });
+            }
+        });
+
+        button2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getLocation(v);
+            }
+        });
+
+        button3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(context, "待完善", Toast.LENGTH_SHORT).show();
             }
         });
 
