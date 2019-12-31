@@ -1,4 +1,4 @@
-package com.wangbj.gpscamera.ui.video;
+package com.wangbj.gpscamera.ui.path;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;

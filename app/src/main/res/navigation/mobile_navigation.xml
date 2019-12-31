@@ -13,7 +13,7 @@
 
     <fragment
         android:id="@+id/navigation_dashboard"
-        android:name="com.wangbj.gpscamera.ui.video.VideoFragment"
+        android:name="com.wangbj.gpscamera.ui.path.PathFragment"
         android:label="@string/title_dashboard"
         tools:layout="@layout/fragment_dashboard" />
 

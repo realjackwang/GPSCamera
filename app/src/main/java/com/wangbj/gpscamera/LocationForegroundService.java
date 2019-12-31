@@ -59,25 +59,29 @@ public class LocationForegroundService extends Service {
         return super.onStartCommand(intent, flags, startId);
     }
 
-    public Location gps() {
+    public Location startGps() {
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         Location location = null;
         //不加这段话会导致下面爆红,（这个俗称版本压制，哈哈哈哈哈哈）
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return null;
         }
-//        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {//是否支持Network定位
-//            //获取最后的network定位信息
-//            location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-//
-//        }
-        //网络获取定位为空时，每隔1秒请求一次
-        if (location == null) {
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0.1f, locationListener);
-            locationManager.addGpsStatusListener(gpsListener);
+        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {//是否支持Network定位
+            //获取最后的network定位信息
+            location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         }
 
+        //每隔1秒请求一次
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0.1f, locationListener);
+        locationManager.addGpsStatusListener(gpsListener);
+
+
         return location;
+    }
+
+
+    public void stopGps(){
+        locationManager.removeUpdates(locationListener);
     }
 
     //显示后台定位通知栏（此为8.0版本通知栏）
@@ -130,7 +134,7 @@ public class LocationForegroundService extends Service {
 
         void onGpsStatue(int status);
 
-        void onGpsChanged(int count);
+        void onGpsChanged(int count,int used);
     }
 
     private LocationCallback mLocationCallback;
@@ -162,14 +166,19 @@ public class LocationForegroundService extends Service {
                     int maxSatellites = gpsStatus.getMaxSatellites();
                     //创建一个迭代器保存所有卫星
                     Iterator<GpsSatellite> iters = gpsStatus.getSatellites().iterator();
-                    int count = 0;
+                    int count = 0; //搜索的所有卫星
+                    int used = 0; //正在使用的卫星
                     while (iters.hasNext() && count <= maxSatellites) {
                         GpsSatellite s = iters.next();
+                        if (s.usedInFix()) {
+                            used++;
+                        }
                         count++;
                     }
                     System.out.println("搜索到："+count+"颗卫星");
-                    mLocationCallback.onGpsChanged(count);
+                    mLocationCallback.onGpsChanged(count,used);
                     break;
+
                 //定位启动
                 case GpsStatus.GPS_EVENT_STARTED:
                     Log.i(TAG, "定位启动");

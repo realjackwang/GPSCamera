@@ -1,40 +1,27 @@
 package com.wangbj.gpscamera;
 
 import android.Manifest;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.PersistableBundle;
-import android.view.Menu;
-import android.view.Window;
 import android.widget.Toast;
 
 import com.ashokvarma.bottomnavigation.BottomNavigationBar;
 import com.ashokvarma.bottomnavigation.BottomNavigationItem;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.wangbj.gpscamera.ui.home.HomeFragment;
 import com.wangbj.gpscamera.ui.user.UserFragment;
-import com.wangbj.gpscamera.ui.video.VideoFragment;
+import com.wangbj.gpscamera.ui.path.PathFragment;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.navigation.NavController;
-import androidx.navigation.NavDestination;
-import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -63,8 +50,8 @@ public class MainActivity extends AppCompatActivity {
                 .setBackgroundStyle(BottomNavigationBar.BACKGROUND_STYLE_STATIC
                 );
         bottomNavigationBar       //定义下面图标及名称及按压颜色
-                .addItem(new BottomNavigationItem(R.drawable.home, "通知").setActiveColorResource(R.color.blue))
-                .addItem(new BottomNavigationItem(R.drawable.video, "发现").setActiveColorResource(R.color.blue))
+                .addItem(new BottomNavigationItem(R.drawable.home, "首页").setActiveColorResource(R.color.blue))
+                .addItem(new BottomNavigationItem(R.drawable.video, "视频").setActiveColorResource(R.color.blue))
                 .addItem(new BottomNavigationItem(R.drawable.user, "个人").setActiveColorResource(R.color.blue))
                 .setFirstSelectedPosition(0)
                 .initialise();
@@ -77,26 +64,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onTabSelected(int position) {
                 if (fragments != null) {
-
-
                     if (position < fragments.size()) {
                         FragmentManager fm = getSupportFragmentManager();
                         FragmentTransaction ft = fm.beginTransaction();
-
                         fragment = fragments.get(position);
                         ft.replace(R.id.layFrame, fragment);
-
-//                        if (fm.getFragments() != null && fm.getFragments().size() > 0) {
-//                            for (Fragment cf : fm.getFragments()) {
-//                                ft.remove(cf);
-//                            }
-//                        }
-
-//                        if (fragment.isAdded()) {
-//                            ft.replace(R.id.layFrame, fragment);
-//                        } else {
-//                            ft.add(R.id.layFrame, fragment);
-//                        }
                         ft.commitAllowingStateLoss();
                     }
                 }
@@ -125,8 +97,8 @@ public class MainActivity extends AppCompatActivity {
 
     private ArrayList<Fragment> getFragments() {
         ArrayList<Fragment> fragments = new ArrayList<>();
-        fragments.add(HomeFragment.newInstance("通知"));
-        fragments.add(VideoFragment.newInstance("视频"));
+        fragments.add(HomeFragment.newInstance("首页"));
+        fragments.add(PathFragment.newInstance("视频"));
         fragments.add(UserFragment.newInstance("个人"));
         return fragments;
     }
