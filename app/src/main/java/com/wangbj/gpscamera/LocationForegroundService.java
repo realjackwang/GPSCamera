@@ -140,7 +140,7 @@ public class LocationForegroundService extends Service {
 
     }
 
-    private class GpsListener implements android.location.GpsStatus.Listener{
+    private class GpsListener implements android.location.GpsStatus.Listener {
         @Override
         public void onGpsStatusChanged(int event) {
             switch (event) {
@@ -152,7 +152,12 @@ public class LocationForegroundService extends Service {
                 case GpsStatus.GPS_EVENT_SATELLITE_STATUS:
                     Log.i(TAG, "卫星状态改变");
                     //获取当前状态
-                    GpsStatus gpsStatus=locationManager.getGpsStatus(null);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                            return;
+                        }
+                    }
+                    GpsStatus gpsStatus = locationManager.getGpsStatus(null);
                     //获取卫星颗数的默认最大值
                     int maxSatellites = gpsStatus.getMaxSatellites();
                     //创建一个迭代器保存所有卫星

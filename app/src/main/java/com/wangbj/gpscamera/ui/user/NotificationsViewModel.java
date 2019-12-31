@@ -1,4 +1,4 @@
-package com.wangbj.gpscamera.ui.notifications;
+package com.wangbj.gpscamera.ui.user;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;

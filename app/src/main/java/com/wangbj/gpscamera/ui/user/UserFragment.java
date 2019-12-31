@@ -1,4 +1,4 @@
-package com.wangbj.gpscamera.ui.notifications;
+package com.wangbj.gpscamera.ui.user;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -18,7 +18,7 @@ import com.wangbj.gpscamera.R;
 //@NonNull 是JSR 305（缺陷检查框架）的注解，是告诉编译器这个域不可能为空，当代码检查有空值时会给
 // 出一个风险警告，目前这个注解只有IDEA支持。
 
-public class NotificationsFragment extends Fragment {
+public class UserFragment extends Fragment {
 
     private NotificationsViewModel notificationsViewModel;
 
@@ -35,4 +35,14 @@ public class NotificationsFragment extends Fragment {
         });
         return root;
     }
+
+
+    public static UserFragment newInstance(String content) {
+        Bundle args = new Bundle();
+        args.putString("ARGS", content);
+        UserFragment fragment = new UserFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
 }

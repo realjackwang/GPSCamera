@@ -37,6 +37,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import okhttp3.Response;
 
 import com.wangbj.gpscamera.LocationForegroundService;
 import com.wangbj.gpscamera.R;
@@ -51,6 +52,8 @@ import java.util.ArrayList;
 import static android.content.ContentValues.TAG;
 
 public class HomeFragment extends Fragment {
+
+    protected WeakReference<View> mRootView;
 
     private HomeViewModel homeViewModel;
     private Context context;
@@ -69,27 +72,30 @@ public class HomeFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              final ViewGroup container, Bundle savedInstanceState) {
-//        homeViewModel =
-//                ViewModelProviders.of(this).get(HomeViewModel.class);
-        View root = inflater.inflate(R.layout.fragment_home, container, false);
-//        final TextView textView = root.findViewById(R.id.text_home);
-//        homeViewModel.getText().observe(this, new Observer<String>() {
-//            @Override
-//            public void onChanged(@Nullable String s) {
-//                textView.setText(s);
-//            }
-//        });
+
+//        View root = inflater.inflate(R.layout.fragment_home, container, false);
+        if (mRootView == null || mRootView.get() == null) {
+            View view=inflater.inflate(R.layout.fragment_home, null);
+            mRootView = new WeakReference<View>(view);
+        } else {
+            ViewGroup parent = (ViewGroup) mRootView.get().getParent();
+            if (parent != null) {
+                parent.removeView(mRootView.get());
+            }
+        }
+
+
 
         context = getContext();
-        Button button = root.findViewById(R.id.button);
-        Button button1 = root.findViewById(R.id.button2);
-        Button button2 = root.findViewById(R.id.button3);
-        Button button3 = root.findViewById(R.id.button4);
+        Button button =  mRootView.get().findViewById(R.id.button);
+        Button button1 =  mRootView.get().findViewById(R.id.button2);
+        Button button2 =  mRootView.get().findViewById(R.id.button3);
+        Button button3 =  mRootView.get().findViewById(R.id.button4);
 
-        txt = root.findViewById(R.id.tv_show);
-        statelite = root.findViewById(R.id.textView2);
-        listView = root.findViewById(R.id.listview);
-        final ProgressBar progressBar = root.findViewById(R.id.progressBar);
+        txt =  mRootView.get().findViewById(R.id.tv_show);
+        statelite =  mRootView.get().findViewById(R.id.textView2);
+        listView =  mRootView.get().findViewById(R.id.listview);
+        final ProgressBar progressBar =  mRootView.get().findViewById(R.id.progressBar);
 
 
         arrayList = new ArrayList<>();
@@ -105,7 +111,8 @@ public class HomeFragment extends Fragment {
                 if (location != null) {
                     arrayList.add("经度" + location.getLatitude() + "纬度:" + location.getLongitude());
                     arrayAdapter.notifyDataSetChanged();
-                    txt.setText("经度" + location.getLatitude() + "  纬度:" + location.getLongitude());
+                    updateShow(location);
+//                    txt.setText("经度" + location.getLatitude() + "  纬度:" + location.getLongitude());
                 } else {
                     txt.setText("正在寻找GPS卫星");
                 }
@@ -116,7 +123,8 @@ public class HomeFragment extends Fragment {
                         if (location != null) {
                             arrayList.add("经度" + location.getLatitude() + "纬度:" + location.getLongitude());
                             arrayAdapter.notifyDataSetChanged();
-                            txt.setText("经度" + location.getLatitude() + "  纬度:" + location.getLongitude());
+                            updateShow(location);
+//                            txt.setText("经度" + location.getLatitude() + "  纬度:" + location.getLongitude());
                         } else {
                             txt.setText("GPS卫星寻找失败");
                         }
@@ -161,7 +169,19 @@ public class HomeFragment extends Fragment {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                TestService.test();
+                TestService.test(new TestService.OnHttpListener() {
+                    @Override
+                    public void onHttpSuccess(Response response) {
+
+                    }
+
+                    @Override
+                    public void onHttpFailed(Exception e) {
+                        Looper.prepare();
+                        Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Looper.loop();
+                    }
+                });
             }
         });
 
@@ -246,7 +266,7 @@ public class HomeFragment extends Fragment {
 //        };
 //        TestTimerRun.run();
 
-        return root;
+        return  mRootView.get();
     }
 
 
@@ -275,10 +295,10 @@ public class HomeFragment extends Fragment {
 
     @Override
     public void onDestroy() {
-        if (isbind) {
-            context.unbindService(connection);
-            isbind = false;
-        }
+//        if (isbind) {
+//            context.unbindService(connection);
+//            isbind = false;
+//        }
         super.onDestroy();
     }
 
@@ -299,36 +319,13 @@ public class HomeFragment extends Fragment {
         } else txt.setText("");
     }
 
-
-    private boolean isGpsAble(LocationManager lm) {
-        return lm.isProviderEnabled(android.location.LocationManager.GPS_PROVIDER) ? true : false;
+    public static HomeFragment newInstance(String content) {
+        Bundle args = new Bundle();
+        args.putString("ARGS", content);
+        HomeFragment fragment = new HomeFragment();
+        fragment.setArguments(args);
+        return fragment;
     }
-
-
-    //打开设置页面让用户自己设置
-    private void openGPS2() {
-        Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-        startActivityForResult(intent, 0);
-    }
-
-
-    public static class MyHandler extends Handler {
-
-        private final ProgressBar progressBar;
-        private WeakReference<Activity> mWeakReference;
-
-        private MyHandler(Activity activity, ProgressBar progressBar) {
-            mWeakReference = new WeakReference<>(activity);
-            this.progressBar = progressBar;
-        }
-
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            this.progressBar.setProgress(msg.arg1);
-        }
-    }
-
 
 
 }

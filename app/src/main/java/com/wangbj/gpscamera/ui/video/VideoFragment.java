@@ -1,4 +1,4 @@
-package com.wangbj.gpscamera.ui.dashboard;
+package com.wangbj.gpscamera.ui.video;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -14,7 +14,7 @@ import androidx.lifecycle.ViewModelProviders;
 import com.amap.api.maps2d.MapView;
 import com.wangbj.gpscamera.R;
 
-public class DashboardFragment extends Fragment {
+public class VideoFragment extends Fragment {
     MapView mMapView = null;
     private DashboardViewModel dashboardViewModel;
 
@@ -34,32 +34,39 @@ public class DashboardFragment extends Fragment {
         mMapView =  root.findViewById(R.id.map);
         //在activity执行onCreate时执行mMapView.onCreate(savedInstanceState)，创建地图
         mMapView.onCreate(savedInstanceState);
+
         return root;
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        //在activity执行onDestroy时执行mMapView.onDestroy()，销毁地图
         mMapView.onDestroy();
     }
     @Override
     public void onResume() {
         super.onResume();
-        //在activity执行onResume时执行mMapView.onResume ()，重新绘制加载地图
         mMapView.onResume();
     }
     @Override
     public void onPause() {
         super.onPause();
-        //在activity执行onPause时执行mMapView.onPause ()，暂停地图的绘制
         mMapView.onPause();
     }
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        //在activity执行onSaveInstanceState时执行mMapView.onSaveInstanceState (outState)，保存地图当前的状态
         mMapView.onSaveInstanceState(outState);
     }
+
+
+    public static VideoFragment newInstance(String content) {
+        Bundle args = new Bundle();
+        args.putString("ARGS", content);
+        VideoFragment fragment = new VideoFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
 }
 

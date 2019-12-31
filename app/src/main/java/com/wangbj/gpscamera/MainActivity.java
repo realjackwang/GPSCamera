@@ -1,12 +1,25 @@
 package com.wangbj.gpscamera;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.PersistableBundle;
+import android.view.Menu;
 import android.view.Window;
 import android.widget.Toast;
 
+import com.ashokvarma.bottomnavigation.BottomNavigationBar;
+import com.ashokvarma.bottomnavigation.BottomNavigationItem;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.wangbj.gpscamera.ui.home.HomeFragment;
+import com.wangbj.gpscamera.ui.user.UserFragment;
+import com.wangbj.gpscamera.ui.video.VideoFragment;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -14,6 +27,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDestination;
 import androidx.navigation.Navigation;
@@ -22,32 +38,131 @@ import androidx.navigation.ui.NavigationUI;
 
 public class MainActivity extends AppCompatActivity {
 
+    private ArrayList<Fragment> fragments;
+    private Fragment fragment;
+
+
+    /**
+     * 双击返回退出程序
+     */
+    private int clickTime = 0;
+    private int times = -1;
+    private Timer timer = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        BottomNavigationView navView = findViewById(R.id.nav_view);
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications)
-                .build();
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
 
-//        Toolbar toolbar = findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
-//        navController.addOnDestinationChangedListener(new NavController.OnDestinationChangedListener() {
-//            @Override
-//            public void onDestinationChanged(@NonNull NavController controller, @NonNull NavDestination destination, @Nullable Bundle arguments) {
-//                Toast.makeText(MainActivity.this, "aaa", Toast.LENGTH_SHORT).show();
-//            }
-//        });
-
-        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-        NavigationUI.setupWithNavController(navView, navController);
         requestPermission();
 
+
+        BottomNavigationBar bottomNavigationBar = (BottomNavigationBar) findViewById(R.id.bottom_navigation_bar);
+        bottomNavigationBar.setMode(BottomNavigationBar.MODE_FIXED);
+        bottomNavigationBar
+                .setBackgroundStyle(BottomNavigationBar.BACKGROUND_STYLE_STATIC
+                );
+        bottomNavigationBar       //定义下面图标及名称及按压颜色
+                .addItem(new BottomNavigationItem(R.drawable.home, "通知").setActiveColorResource(R.color.blue))
+                .addItem(new BottomNavigationItem(R.drawable.video, "发现").setActiveColorResource(R.color.blue))
+                .addItem(new BottomNavigationItem(R.drawable.user, "个人").setActiveColorResource(R.color.blue))
+                .setFirstSelectedPosition(0)
+                .initialise();
+
+        fragments = getFragments();
+        fragment = fragments.get(0);
+        setDefaultFragment();
+
+        bottomNavigationBar.setTabSelectedListener(new BottomNavigationBar.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(int position) {
+                if (fragments != null) {
+
+
+                    if (position < fragments.size()) {
+                        FragmentManager fm = getSupportFragmentManager();
+                        FragmentTransaction ft = fm.beginTransaction();
+
+                        fragment = fragments.get(position);
+                        ft.replace(R.id.layFrame, fragment);
+
+//                        if (fm.getFragments() != null && fm.getFragments().size() > 0) {
+//                            for (Fragment cf : fm.getFragments()) {
+//                                ft.remove(cf);
+//                            }
+//                        }
+
+//                        if (fragment.isAdded()) {
+//                            ft.replace(R.id.layFrame, fragment);
+//                        } else {
+//                            ft.add(R.id.layFrame, fragment);
+//                        }
+                        ft.commitAllowingStateLoss();
+                    }
+                }
+            }
+
+            @Override
+            public void onTabUnselected(int position) {
+
+            }
+
+            @Override
+            public void onTabReselected(int position) {
+
+            }
+        });
+
     }
+
+
+    private void setDefaultFragment() {     //设定默认的主页
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction transaction = fm.beginTransaction();
+        transaction.replace(R.id.layFrame, fragment);
+        transaction.commit();
+    }
+
+    private ArrayList<Fragment> getFragments() {
+        ArrayList<Fragment> fragments = new ArrayList<>();
+        fragments.add(HomeFragment.newInstance("通知"));
+        fragments.add(VideoFragment.newInstance("视频"));
+        fragments.add(UserFragment.newInstance("个人"));
+        return fragments;
+    }
+
+
+    public void onBackPressed() {    //按两次返回退出程序
+
+        clickTime = clickTime + 1;
+
+        if (clickTime == 1 && timer == null) {
+            Toast.makeText(MainActivity.this, "再按一次退出", Toast.LENGTH_SHORT).show();
+            timer = new Timer();
+            timer.schedule(new TimerTask() {
+
+                @Override
+                public void run() {
+                    times = times + 1;
+                    if (times == 2) {
+                        clickTime = 0;
+                        times = -1;
+                        timer.cancel();
+                        timer = null;
+                    }
+                }
+            }, 0, 1000);
+        } else if (clickTime == 2) {
+            if (timer != null) {
+                timer.cancel();
+                timer = null;
+                super.onBackPressed();
+            } else {
+                super.onBackPressed();
+            }
+        }
+    }
+
 
     /**
      * request for the GPS and storage permission
