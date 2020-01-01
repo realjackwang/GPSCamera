@@ -11,6 +11,7 @@ import android.location.Address;
 import android.location.Location;
 import android.location.LocationManager;
 import android.location.LocationProvider;
+import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
@@ -36,16 +37,16 @@ import com.amap.api.location.AMapLocationClientOption;
 
 import com.amap.api.location.CoordinateConverter;
 import com.amap.api.location.DPoint;
-import com.amap.api.maps2d.AMap;
-import com.amap.api.maps2d.CameraUpdate;
-import com.amap.api.maps2d.CameraUpdateFactory;
-import com.amap.api.maps2d.LocationSource;
-import com.amap.api.maps2d.MapView;
-import com.amap.api.maps2d.UiSettings;
+import com.amap.api.maps.AMap;
+import com.amap.api.maps.CameraUpdate;
+import com.amap.api.maps.CameraUpdateFactory;
+import com.amap.api.maps.LocationSource;
+import com.amap.api.maps.MapView;
+import com.amap.api.maps.UiSettings;
 
-import com.amap.api.maps2d.model.LatLng;
-import com.amap.api.maps2d.model.MyLocationStyle;
-import com.amap.api.maps2d.model.PolylineOptions;
+import com.amap.api.maps.model.LatLng;
+import com.amap.api.maps.model.MyLocationStyle;
+import com.amap.api.maps.model.PolylineOptions;
 import com.amap.api.services.core.AMapException;
 import com.amap.api.services.core.LatLonPoint;
 import com.amap.api.services.geocoder.GeocodeResult;
@@ -54,6 +55,7 @@ import com.amap.api.services.geocoder.RegeocodeAddress;
 import com.amap.api.services.geocoder.RegeocodeQuery;
 import com.amap.api.services.geocoder.RegeocodeResult;
 import com.wangbj.gpscamera.FakeLocationService;
+import com.wangbj.gpscamera.LocationForegroundService;
 import com.wangbj.gpscamera.R;
 import com.wangbj.gpscamera.bean.Path;
 import com.wangbj.gpscamera.utils.ACache;
@@ -71,9 +73,11 @@ import static com.wangbj.gpscamera.utils.TimeFormat.formatUTC;
 
 public class HomeFragment extends Fragment implements LocationSource, GeocodeSearch.OnGeocodeSearchListener {
 
-    protected WeakReference<View> mRootView;
+    private WeakReference<View> mRootView;
     private Context context;
     private GeocodeSearch.OnGeocodeSearchListener content;
+
+    private boolean isbind;
 
     private TextView txt;
     private ListView listView;
@@ -88,14 +92,14 @@ public class HomeFragment extends Fragment implements LocationSource, GeocodeSea
     private ProgressBar progressBar;
 
 
-    boolean isLocation = false; //是否已经开始定位
-    boolean isPath = false; //是否开始记录轨迹
+    private boolean isLocation = false; //是否已经开始定位
+    private boolean isPath = false; //是否开始记录轨迹
     private Location lostLocation = null; //上一次的位置，用于画线
 
     private Path path; //轨迹
 
     private ServiceConnection connection;
-    private FakeLocationService locationForegroundService;
+    private LocationForegroundService locationForegroundService;
 
     private ArrayList<String[]> arrayList;
 
@@ -142,7 +146,7 @@ public class HomeFragment extends Fragment implements LocationSource, GeocodeSea
         mUiSettings.setMyLocationButtonEnabled(true);
 
         MyLocationStyle myLocationStyle = new MyLocationStyle();
-        myLocationStyle.myLocationType(MyLocationStyle.LOCATION_TYPE_FOLLOW);
+        myLocationStyle.myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE_NO_CENTER);
         aMap.setMyLocationStyle(myLocationStyle);
 
         CameraUpdate mCameraUpdate = CameraUpdateFactory.zoomTo(16);
@@ -242,7 +246,11 @@ public class HomeFragment extends Fragment implements LocationSource, GeocodeSea
                     isLocation = false;
                     button5.setText("开启GPS");
                     locationForegroundService.stopGps();
-                    context.unbindService(connection);
+                    if (isbind){
+                        context.unbindService(connection);
+                        isbind = false;
+                    }
+
 
                 }
 
@@ -355,6 +363,35 @@ public class HomeFragment extends Fragment implements LocationSource, GeocodeSea
     }
 
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        //在activity执行onDestroy时执行mMapView.onDestroy()，销毁地图
+        mMapView.onDestroy();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        //在activity执行onResume时执行mMapView.onResume ()，重新绘制加载地图
+        mMapView.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        //在activity执行onPause时执行mMapView.onPause ()，暂停地图的绘制
+        mMapView.onPause();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        //在activity执行onSaveInstanceState时执行mMapView.onSaveInstanceState (outState)，保存地图当前的状态
+        mMapView.onSaveInstanceState(outState);
+    }
+
+
 
 
 
@@ -379,13 +416,13 @@ public class HomeFragment extends Fragment implements LocationSource, GeocodeSea
             @Override
             public void onServiceConnected(ComponentName name, IBinder service) {
                 Log.e(TAG, "--->onServiceConnected");
-                locationForegroundService = ((FakeLocationService.LocalBinder) service).getFakeLoactionService();
+                locationForegroundService = ((LocationForegroundService.LocalBinder) service).getLocationForegroundService();
 
                 Location location = locationForegroundService.startGps();
                 if (location != null) {
 
 //                    arrayList.add("经度" + location.getLatitude() + "纬度:" + location.getLongitude());
-                    arrayAdapter.notifyDataSetChanged();
+//                    arrayAdapter.notifyDataSetChanged();
 
                     AMapLocation amapLocation = fromGpsToAmap(location);
                     mListener.onLocationChanged(amapLocation);
@@ -400,7 +437,7 @@ public class HomeFragment extends Fragment implements LocationSource, GeocodeSea
                     txt.setText("正在寻找GPS卫星");
                 }
 
-                locationForegroundService.setLocationCallback(new FakeLocationService.LocationCallback() {
+                locationForegroundService.setLocationCallback(new LocationForegroundService.LocationCallback() {
                     @Override
                     public void onLocation(Location location) {
                         if (location != null) {
@@ -492,8 +529,8 @@ public class HomeFragment extends Fragment implements LocationSource, GeocodeSea
                 }
             }
 
-            Intent intent = new Intent(context, FakeLocationService.class);
-            context.bindService(intent, connection, Context.BIND_AUTO_CREATE);
+            Intent intent = new Intent(context, LocationForegroundService.class);
+            isbind = context.bindService(intent, connection, Context.BIND_AUTO_CREATE);
         }
 
         private boolean GPSOpen () {
@@ -505,10 +542,6 @@ public class HomeFragment extends Fragment implements LocationSource, GeocodeSea
             return gps || network;
         }
 
-        @Override
-        public void onDestroy () {
-            super.onDestroy();
-        }
 
 
         //定义一个更新显示的方法

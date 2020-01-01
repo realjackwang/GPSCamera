@@ -26,7 +26,7 @@ import java.util.HashMap;
 
 public class PathFragment extends ListFragment {
 
-    protected WeakReference<View> mRootView;
+    private WeakReference<View> mRootView;
     private ListView listView;
     private ArrayList pathlist;
     private SimpleAdapter adapter;
@@ -39,7 +39,7 @@ public class PathFragment extends ListFragment {
 
         if (mRootView == null || mRootView.get() == null) {
             View view = inflater.inflate(R.layout.fragment_dashboard, null);
-            mRootView = new WeakReference<View>(view);
+            mRootView = new WeakReference<>(view);
         } else {
             ViewGroup parent = (ViewGroup) mRootView.get().getParent();
             if (parent != null) {
@@ -49,21 +49,19 @@ public class PathFragment extends ListFragment {
 
         aCache = ACache.get(getContext());
 
-        ArrayList<Path> arrayList  =  (ArrayList<Path>) aCache.getAsObject("PathHistory");
+        ArrayList<Path> arrayList = (ArrayList<Path>) aCache.getAsObject("PathHistory");
 
-        if (arrayList != null){
+        if (arrayList != null) {
             pathlist = arrayList;
             adapter = new SimpleAdapter(getContext(),
                     pathlist, R.layout.path_listviewitem,
-                    new String[]{"title", "info","starttime","endtime"},
-                    new int[]{R.id.title, R.id.info,R.id.starttime,R.id.endtime});
+                    new String[]{"title", "info", "starttime", "endtime"},
+                    new int[]{R.id.title, R.id.info, R.id.starttime, R.id.endtime});
             setListAdapter(adapter);
         }
 
         return mRootView.get();
     }
-
-
 
 
     public static PathFragment newInstance(String content) {
@@ -76,21 +74,19 @@ public class PathFragment extends ListFragment {
 
 
     @Override
-    public void onListItemClick(ListView l, View v, int position, long id) {
-        Path map=(Path) l.getItemAtPosition(position);
-        final long Text= (long)map.get("id");
-        final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),android.R.style.Theme_DeviceDefault_Light_Dialog_NoActionBar);
+    public void onListItemClick(ListView l, View v, final int position, long id) {
+        Path map = (Path) l.getItemAtPosition(position);
+        final long Text = (long) map.get("id");
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), android.R.style.Theme_DeviceDefault_Light_Dialog_NoActionBar);
 
         builder.setTitle("选择一个选项");
         //    指定下拉列表的显示数据
-        final String[] cities = {"查看路径", "下载视频", "分享路径","删除路径"};
+        final String[] choices = {"查看路径", "下载视频", "分享路径", "删除路径"};
         //    设置一个下拉的列表选择项
-        builder.setItems(cities, new DialogInterface.OnClickListener()
-        {
+        builder.setItems(choices, new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which)
-            {
-                switch (which){
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which) {
                     case 0:
                         Intent intent = new Intent();
                         intent.putExtra("id", Text);
@@ -98,13 +94,33 @@ public class PathFragment extends ListFragment {
                         getActivity().startActivity(intent);
                         break;
                     case 1:
-                        Log.e("onListItemClick","下载视频");
+                        Log.e("onListItemClick", "下载视频");
                         break;
                     case 2:
-                        Log.e("onListItemClick","分享路径");
+                        Log.e("onListItemClick", "分享路径");
                         break;
                     case 3:
-                        Log.e("onListItemClick","删除路径");
+
+                        ArrayList<Path> pathlist1 = (ArrayList<Path>) aCache.getAsObject("PathHistory");
+                        Path path = new Path();
+                        for (int i = 0; i < pathlist1.size(); i++) {
+                            if (pathlist1.get(i).get("id").equals(Text)) {
+                                path = pathlist1.get(i);
+                                break;
+                            }
+                        }
+
+                        pathlist1.remove(path);
+
+
+                        adapter = new SimpleAdapter(getContext(),
+                                pathlist1, R.layout.path_listviewitem,
+                                new String[]{"title", "info", "starttime", "endtime"},
+                                new int[]{R.id.title, R.id.info, R.id.starttime, R.id.endtime});
+                        setListAdapter(adapter);
+
+
+                        aCache.put("PathHistory", pathlist1);
                         break;
 
 
@@ -113,8 +129,6 @@ public class PathFragment extends ListFragment {
         });
         builder.show();
 
-
-        // TODO Auto-generated method stub
         super.onListItemClick(l, v, position, id);
     }
 

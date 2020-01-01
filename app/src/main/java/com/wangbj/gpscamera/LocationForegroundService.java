@@ -42,6 +42,7 @@ public class LocationForegroundService extends Service {
     private LocalBinder localBinder = new LocalBinder();
     private NotificationChannel channel;
     private LocationListener locationListener = new LocationListener(LocationManager.GPS_PROVIDER);
+    private LocationListener locationListener2 = new LocationListener(LocationManager.NETWORK_PROVIDER);
     private GpsListener gpsListener = new GpsListener();
     private LocationManager locationManager;
     private ACache aCache;
@@ -72,7 +73,8 @@ public class LocationForegroundService extends Service {
         }
 
         //每隔1秒请求一次
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0.1f, locationListener);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, locationListener);
+
         locationManager.addGpsStatusListener(gpsListener);
 
 
@@ -177,6 +179,16 @@ public class LocationForegroundService extends Service {
                     }
                     System.out.println("搜索到："+count+"颗卫星");
                     mLocationCallback.onGpsChanged(count,used);
+
+                    /**
+                     * 如果卫星可用数小于3个，开启网络定位
+                     */
+                    if(used < 3){
+                        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 1, locationListener2);
+                    }
+                    else{
+                        locationManager.removeUpdates(locationListener2);
+                    }
                     break;
 
                 //定位启动
