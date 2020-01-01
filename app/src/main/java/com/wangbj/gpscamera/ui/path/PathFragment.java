@@ -1,54 +1,41 @@
 package com.wangbj.gpscamera.ui.path;
 
-import android.annotation.SuppressLint;
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.content.Context;
-import android.graphics.Color;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.ListFragment;
 
-import com.amap.api.location.AMapLocation;
-import com.amap.api.location.AMapLocationClient;
-import com.amap.api.location.AMapLocationClientOption;
-import com.amap.api.location.AMapLocationListener;
-import com.amap.api.maps2d.AMap;
-import com.amap.api.maps2d.CameraUpdate;
-import com.amap.api.maps2d.CameraUpdateFactory;
-import com.amap.api.maps2d.LocationSource;
-import com.amap.api.maps2d.MapView;
-import com.amap.api.maps2d.UiSettings;
-
-import com.amap.api.maps2d.model.MyLocationStyle;
 import com.wangbj.gpscamera.R;
+import com.wangbj.gpscamera.bean.Path;
+import com.wangbj.gpscamera.utils.ACache;
 
 import java.lang.ref.WeakReference;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.HashMap;
 
-public class PathFragment extends Fragment implements LocationSource, AMapLocationListener {
+public class PathFragment extends ListFragment {
 
     protected WeakReference<View> mRootView;
-    private MapView mMapView = null;
-    private AMap aMap;
-    private UiSettings mUiSettings;//定义一个UiSettings对象
+    private ListView listView;
+    private ArrayList pathlist;
+    private SimpleAdapter adapter;
 
-
-    public AMapLocationClient mlocationClient;
-    public AMapLocationClientOption mLocationOption = null;
-    private OnLocationChangedListener mListener;
+    private ACache aCache;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
-//        View root = inflater.inflate(R.layout.fragment_dashboard, container, false);
 
         if (mRootView == null || mRootView.get() == null) {
             View view = inflater.inflate(R.layout.fragment_dashboard, null);
@@ -60,95 +47,23 @@ public class PathFragment extends Fragment implements LocationSource, AMapLocati
             }
         }
 
+        aCache = ACache.get(getContext());
 
-        mMapView = mRootView.get().findViewById(R.id.map);
+        ArrayList<Path> arrayList  =  (ArrayList<Path>) aCache.getAsObject("PathHistory");
 
-        //在activity执行onCreate时执行mMapView.onCreate(savedInstanceState)，创建地图
-        mMapView.onCreate(savedInstanceState);
-
-        aMap = mMapView.getMap();
-        aMap.setLocationSource(this);//通过aMap对象设置定位数据源的监听
-        mUiSettings = aMap.getUiSettings();//实例化UiSettings类对象
-        mUiSettings.setCompassEnabled(true);
-        mUiSettings.setMyLocationButtonEnabled(true);
-        aMap.setMyLocationEnabled(true);// 可触发定位并显示当前位置
-
-
-        mlocationClient = new AMapLocationClient(getContext());   //初始化定位参数
-        mLocationOption = new AMapLocationClientOption();
-        mlocationClient.setLocationListener(this); //设置定位监听
-        mLocationOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy);  //设置定位模式为高精度模式，Battery_Saving为低功耗模式，Device_Sensors是仅设备模式
-        mLocationOption.setInterval(2000); //设置定位间隔,单位毫秒,默认为2000ms
-        mLocationOption.setOnceLocation(false);//设置是否只定位一次,默认为false
-
-        MyLocationStyle myLocationStyle = new MyLocationStyle();
-        myLocationStyle.myLocationType(MyLocationStyle.LOCATION_TYPE_FOLLOW_NO_CENTER);
-        aMap.setMyLocationStyle(myLocationStyle);
-
-        CameraUpdate mCameraUpdate=CameraUpdateFactory.zoomTo(19);
-        aMap.moveCamera(mCameraUpdate);
-
-        mlocationClient.setLocationOption(mLocationOption); //设置定位参数
-        // 此方法为每隔固定时间会发起一次定位请求，为了减少电量消耗或网络流量消耗，
-        // 注意设置合适的定位时间的间隔（最小间隔支持为1000ms），并且在合适时间调用stopLocation()方法来取消定位请求
-        // 在定位结束后，在合适的生命周期调用onDestroy()方法
-        // 在单次定位情况下，定位无论成功与否，都无需调用stopLocation()方法移除请求，定位sdk内部会移除
-        mlocationClient.startLocation();//启动定位
-
+        if (arrayList != null){
+            pathlist = arrayList;
+            adapter = new SimpleAdapter(getContext(),
+                    pathlist, R.layout.path_listviewitem,
+                    new String[]{"title", "info","starttime","endtime"},
+                    new int[]{R.id.title, R.id.info,R.id.starttime,R.id.endtime});
+            setListAdapter(adapter);
+        }
 
         return mRootView.get();
     }
 
-    @Override
-    public void onLocationChanged(AMapLocation amapLocation) {
-        if (amapLocation != null) {
-            if (amapLocation.getErrorCode() == 0) {
-                //定位成功回调信息，设置相关消息
-                amapLocation.getLocationType();//获取当前定位结果来源，如网络定位结果，详见定位类型表
-                amapLocation.getLatitude();//获取纬度
-                amapLocation.getLongitude();//获取经度
-                amapLocation.getAccuracy();//获取精度信息
-                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                Date date = new Date(amapLocation.getTime());
-                df.format(date);//定位时间
 
-            } else {
-                //显示错误信息ErrCode是错误码，errInfo是错误信息，详见错误码表。
-                Log.e("AmapError", "location Error, ErrCode:"
-                        + amapLocation.getErrorCode() + ", errInfo:"
-                        + amapLocation.getErrorInfo());
-            }
-        }
-    }
-
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-//        mMapView.onDestroy();
-    }
-
-    @Override
-    public void onResume() {
-        mlocationClient.disableBackgroundLocation(true);
-        super.onResume();
-
-//        mMapView.onResume();
-    }
-
-    @Override
-    public void onPause() {
-        mlocationClient.enableBackgroundLocation(2001, buildNotification());
-        super.onPause();
-
-//        mMapView.onPause();
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-//        mMapView.onSaveInstanceState(outState);
-    }
 
 
     public static PathFragment newInstance(String content) {
@@ -159,57 +74,49 @@ public class PathFragment extends Fragment implements LocationSource, AMapLocati
         return fragment;
     }
 
-    @Override
-    public void activate(OnLocationChangedListener onLocationChangedListener) {
-        mListener = onLocationChangedListener;
-    }
 
     @Override
-    public void deactivate() {
+    public void onListItemClick(ListView l, View v, int position, long id) {
+        Path map=(Path) l.getItemAtPosition(position);
+        final long Text= (long)map.get("id");
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),android.R.style.Theme_DeviceDefault_Light_Dialog_NoActionBar);
 
-    }
+        builder.setTitle("选择一个选项");
+        //    指定下拉列表的显示数据
+        final String[] cities = {"查看路径", "下载视频", "分享路径","删除路径"};
+        //    设置一个下拉的列表选择项
+        builder.setItems(cities, new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+                switch (which){
+                    case 0:
+                        Intent intent = new Intent();
+                        intent.putExtra("id", Text);
+                        intent.setClass(getActivity(), PathDetail.class);
+                        getActivity().startActivity(intent);
+                        break;
+                    case 1:
+                        Log.e("onListItemClick","下载视频");
+                        break;
+                    case 2:
+                        Log.e("onListItemClick","分享路径");
+                        break;
+                    case 3:
+                        Log.e("onListItemClick","删除路径");
+                        break;
 
 
-    private static final String NOTIFICATION_CHANNEL_NAME = "BackgroundLocation";
-    private NotificationManager notificationManager = null;
-    boolean isCreateChannel = false;
-    @SuppressLint("NewApi")
-    private Notification buildNotification() {
-
-        Notification.Builder builder = null;
-        Notification notification = null;
-        if(android.os.Build.VERSION.SDK_INT >= 26) {
-            //Android O上对Notification进行了修改，如果设置的targetSDKVersion>=26建议使用此种方式创建通知栏
-            if (null == notificationManager) {
-                notificationManager = (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
+                }
             }
-            String channelId = getContext().getPackageName();
-            if(!isCreateChannel) {
-                NotificationChannel notificationChannel = new NotificationChannel(channelId,
-                        NOTIFICATION_CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT);
-                notificationChannel.enableLights(true);//是否在桌面icon右上角展示小圆点
-                notificationChannel.setLightColor(Color.BLUE); //小圆点颜色
-                notificationChannel.setShowBadge(true); //是否在久按桌面图标时显示此渠道的通知
-                notificationManager.createNotificationChannel(notificationChannel);
-                isCreateChannel = true;
-            }
-            builder = new Notification.Builder(getContext().getApplicationContext(), channelId);
-        } else {
-            builder = new Notification.Builder(getContext().getApplicationContext());
-        }
-        builder.setSmallIcon(R.drawable.ic_launcher)
-                .setContentTitle("GPSCamera")
-                .setContentText("正在后台运行")
-                .setWhen(System.currentTimeMillis());
+        });
+        builder.show();
 
-        if (android.os.Build.VERSION.SDK_INT >= 16) {
-            notification = builder.build();
-        } else {
-            return builder.getNotification();
-        }
-        return notification;
+
+        // TODO Auto-generated method stub
+        super.onListItemClick(l, v, position, id);
     }
-
 
 
 }
