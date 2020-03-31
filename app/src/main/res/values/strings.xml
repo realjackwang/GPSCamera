@@ -1,6 +1,8 @@
 <resources>
-    <string name="app_name">GPSCamera</string>
+    <string name="app_name">云拍</string>
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
+    <string name="user_access_admin">管理员</string>
+    <string name="user_access_enterprise">商家</string>
 </resources>

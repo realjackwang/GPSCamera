@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="80dp"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <ImageView
+        android:id="@+id/iv_marker"
+        android:layout_gravity="center"
+        android:layout_width="38dp"
+        android:layout_height="38dp"
+        android:src="@drawable/ic_marker_place" />
+
+    <TextView
+        android:id="@+id/marker_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="ERROR"
+        android:textColor="@color/black"
+        android:shadowColor="#ccc"
+        android:shadowDx="0.5"
+        android:shadowDy="0.5"
+        android:shadowRadius="2"
+        android:textSize="12sp"
+        android:gravity="center"
+        android:ems="9"
+         />
+
+</LinearLayout>
+
+
+

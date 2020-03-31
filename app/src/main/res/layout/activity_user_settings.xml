@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:fitsSystemWindows="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/blue"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="?attr/actionBarTheme">
+
+        <ImageView
+            android:id="@+id/back"
+            android:onClick="back"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="left|center"
+            android:layout_marginLeft="10dp"
+            android:src="@drawable/ic_returns" />
+
+        <TextView
+            android:id="@+id/textView13"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left|center"
+            android:layout_marginLeft="60dp"
+            android:text="设置"
+            android:textColor="@color/white"
+            android:textSize="18dp" />
+
+    </androidx.appcompat.widget.Toolbar>
+
+
+    <LinearLayout style="@style/wrap_layout">
+        <!-- 上圆角-->
+        <LinearLayout
+            style="@style/top_layout"
+            android:onClick="user_settings">
+
+            <TextView
+                style="@style/usertext"
+                android:text="账号设置" />
+
+            <ImageView style="@style/img_arrow" />
+        </LinearLayout>
+
+<!--        &lt;!&ndash; 分割线 &ndash;&gt;-->
+<!--        <View style="@style/bg_line" />-->
+<!--        &lt;!&ndash; 无圆角&ndash;&gt;-->
+<!--        <LinearLayout style="@style/mid_layout">-->
+
+<!--            <TextView-->
+<!--                style="@style/usertext"-->
+<!--                android:text="消息提醒" />-->
+
+<!--            <ImageView style="@style/img_arrow" />-->
+<!--        </LinearLayout>-->
+
+        <View style="@style/bg_line" />
+        <!-- 下圆角-->
+        <LinearLayout
+            style="@style/bottom_layout"
+            android:onClick="feedback">
+
+            <TextView
+                style="@style/usertext"
+                android:text="意见反馈" />
+
+            <ImageView style="@style/img_arrow" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+
+    <LinearLayout style="@style/wrap_layout">
+
+        <LinearLayout style="@style/single_layout"
+            android:onClick="show_privacy_note"
+            >
+
+            <TextView
+                style="@style/usertext"
+                android:text="自动上传轨迹" />
+
+
+            <Switch
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+            </Switch>
+
+        </LinearLayout>
+
+        <View style="@style/bg_line" />
+
+        <LinearLayout
+            style="@style/mid_layout"
+            android:onClick="app_info">
+
+            <TextView
+                style="@style/usertext"
+                android:text="自动获取视频" />
+
+
+            <Switch
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+            </Switch>
+        </LinearLayout>
+    </LinearLayout>
+
+
+
+
+    <!-- 全圆角-->
+    <LinearLayout style="@style/wrap_layout">
+
+        <LinearLayout style="@style/single_layout"
+            android:onClick="show_privacy_note"
+            >
+
+            <TextView
+                style="@style/usertext"
+                android:text="使用条款" />
+
+            <ImageView style="@style/img_arrow" />
+        </LinearLayout>
+
+        <View style="@style/bg_line" />
+
+        <LinearLayout
+            style="@style/mid_layout"
+            android:onClick="app_info">
+
+            <TextView
+                style="@style/usertext"
+                android:text="关于软件" />
+
+            <ImageView style="@style/img_arrow" />
+        </LinearLayout>
+
+        <View style="@style/bg_line" />
+
+        <LinearLayout
+            style="@style/mid_layout"
+            android:onClick="open_source">
+
+            <TextView
+                style="@style/usertext"
+                android:text="开源许可" />
+
+            <ImageView style="@style/img_arrow" />
+        </LinearLayout>
+
+        <View style="@style/bg_line" />
+
+        <LinearLayout
+            style="@style/mid_layout"
+            android:onClick="check_update">
+
+            <TextView
+                style="@style/usertext"
+                android:text="检查更新" />
+
+            <TextView
+                style="@style/usertext"
+                android:textSize="12dip"
+                android:text="当前版本：0.1" />
+
+            <ImageView style="@style/img_arrow" />
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <LinearLayout style="@style/wrap_layout">
+
+        <LinearLayout
+            style="@style/single_layout"
+            android:onClick="quit_account">
+
+            <TextView
+                style="@style/usertext"
+                android:gravity="center_horizontal"
+                android:text="退出我的账户"
+                android:textColor="@color/orange" />
+
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+</LinearLayout>

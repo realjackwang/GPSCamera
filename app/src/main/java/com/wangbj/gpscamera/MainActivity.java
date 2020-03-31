@@ -41,8 +41,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        requestPermission();
-
 
         BottomNavigationBar bottomNavigationBar = (BottomNavigationBar) findViewById(R.id.bottom_navigation_bar);
         bottomNavigationBar.setMode(BottomNavigationBar.MODE_FIXED);
@@ -50,9 +48,9 @@ public class MainActivity extends AppCompatActivity {
                 .setBackgroundStyle(BottomNavigationBar.BACKGROUND_STYLE_STATIC
                 );
         bottomNavigationBar       //定义下面图标及名称及按压颜色
-                .addItem(new BottomNavigationItem(R.drawable.home, "首页").setActiveColorResource(R.color.blue))
-                .addItem(new BottomNavigationItem(R.drawable.video, "视频").setActiveColorResource(R.color.blue))
-                .addItem(new BottomNavigationItem(R.drawable.user, "个人").setActiveColorResource(R.color.blue))
+                .addItem(new BottomNavigationItem(R.drawable.ic_home, "首页").setActiveColorResource(R.color.blue))
+                .addItem(new BottomNavigationItem(R.drawable.ic_video, "轨迹").setActiveColorResource(R.color.blue))
+                .addItem(new BottomNavigationItem(R.drawable.ic_user, "我的").setActiveColorResource(R.color.blue))
                 .setFirstSelectedPosition(0)
                 .initialise();
 
@@ -63,14 +61,19 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigationBar.setTabSelectedListener(new BottomNavigationBar.OnTabSelectedListener() {
             @Override
             public void onTabSelected(int position) {
+                FragmentManager fm = getSupportFragmentManager();
+                FragmentTransaction ft = fm.beginTransaction();
+
                 if (fragments != null) {
-                    if (position < fragments.size()) {
-                        FragmentManager fm = getSupportFragmentManager();
-                        FragmentTransaction ft = fm.beginTransaction();
-                        fragment = fragments.get(position);
-                        ft.replace(R.id.layFrame, fragment);
-                        ft.commitAllowingStateLoss();
+
+                    for (int i = 0; i < fragments.size(); i++) {
+                        ft.hide(fragments.get(i));
                     }
+
+                    fragment = fragments.get(position);
+                    ft.show(fragment);
+                    ft.commitAllowingStateLoss();
+
                 }
             }
 
@@ -87,19 +90,31 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
     private void setDefaultFragment() {     //设定默认的主页
         FragmentManager fm = getSupportFragmentManager();
-        FragmentTransaction transaction = fm.beginTransaction();
-        transaction.replace(R.id.layFrame, fragment);
-        transaction.commit();
+        FragmentTransaction ft = fm.beginTransaction();
+
+        for (int i = 0; i < fragments.size(); i++) {
+            ft.hide(fragments.get(i));
+        }
+
+        ft.show(fragments.get(0));
+        ft.commit();
     }
 
     private ArrayList<Fragment> getFragments() {
         ArrayList<Fragment> fragments = new ArrayList<>();
         fragments.add(HomeFragment.newInstance("首页"));
-        fragments.add(PathFragment.newInstance("视频"));
-        fragments.add(UserFragment.newInstance("个人"));
+        fragments.add(PathFragment.newInstance("轨迹"));
+        fragments.add(UserFragment.newInstance("我的"));
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction transaction = fm.beginTransaction();
+
+        transaction.add(R.id.layFrame, fragments.get(0));
+        transaction.add(R.id.layFrame, fragments.get(1));
+        transaction.add(R.id.layFrame, fragments.get(2));
+
+        transaction.commit();
         return fragments;
     }
 
@@ -136,52 +151,5 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    /**
-     * request for the GPS and storage permission
-     */
-    private void requestPermission() {
-        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 200);
-        }
-        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 201);
-        }
-        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                    Manifest.permission.READ_EXTERNAL_STORAGE}, 0);
-        }
-    }
-
-
-    /**
-     * Callback for the gps permission
-     */
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode) {
-            case 200:
-                if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(MainActivity.this, "未开启定位权限,请手动到设置去开启权限", Toast.LENGTH_LONG).show();
-                }
-            case 201:
-                if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(MainActivity.this, "未开启网络定位权限,请手动到设置去开启权限", Toast.LENGTH_LONG).show();
-                }
-            case 0:
-                if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(MainActivity.this, "未开启存储权限,请手动到设置去开启权限", Toast.LENGTH_LONG).show();
-                }
-            default:
-                break;
-
-
-        }
-
-
-    }
 }
 

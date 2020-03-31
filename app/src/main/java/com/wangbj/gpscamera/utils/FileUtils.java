@@ -11,30 +11,20 @@ import java.io.File;
  * @email 544907049@qq.com
  **/
 public class FileUtils {
-    private String path = Environment.getExternalStorageDirectory().toString() + "/shidoe";
+//    private String path = Environment.getExternalStorageDirectory().toString() + "/shidoe";
 
-    public FileUtils() {
+    public static void createFile(String path) {
         File file = new File(path);
-        /**
-         *如果文件夹不存在就创建
-         */
         if (!file.exists()) {
             file.mkdirs();
         }
     }
 
-    /**
-     * 创建一个文件
-     * @param FileName 文件名
-     * @return
-     */
-    public File createFile(String FileName) {
-        return new File(path, FileName);
+
+    public static boolean checkFile(String path) {
+        File file = new File(path);
+        return file.exists();
     }
 
-
-    public static void openFile(File file){
-
-    }
 
 }

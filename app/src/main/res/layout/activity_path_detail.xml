@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.path.PathDetail">
+    tools:context=".ui.path.PathDetailActivity">
 
     <com.amap.api.maps.MapView
         android:id="@+id/map"
@@ -12,5 +12,21 @@
         android:layout_height="match_parent">
 
     </com.amap.api.maps.MapView>
+
+
+    <ImageButton
+        android:layout_width="25dip"
+        android:layout_height="25dip"
+        android:background="@color/nothing"
+        android:elevation="1dip"
+        android:onClick="back"
+        android:scaleType="fitXY"
+        android:src="@drawable/ic_returns_dark"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.05"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.07" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

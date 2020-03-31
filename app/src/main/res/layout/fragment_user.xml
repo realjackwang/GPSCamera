@@ -1,0 +1,381 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:custom="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F0F3F6"
+    android:baselineAligned="false"
+    android:orientation="vertical"
+    android:weightSum="1">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="180dp"
+        android:background="@color/blue"
+        android:elevation="4dp"
+        android:fitsSystemWindows="true">
+
+
+        <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/iv_head"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_gravity="left|top"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="30dp"
+            android:elevation="10dip"
+            android:src="@drawable/ic_logo"
+            app:civ_border_color="#797979"
+            app:civ_border_width="0dp" />
+
+
+        <FrameLayout
+            android:id="@+id/user_info"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_gravity="left|top"
+            android:layout_marginLeft="100dp"
+            android:layout_marginTop="30dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+
+                <TextView
+                    android:id="@+id/phone"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="手机号"
+                    android:textColor="@color/white"
+                    android:textSize="18dp"
+                    android:textStyle="bold" />
+
+                <TextView
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="  "
+                    android:textColor="@color/white"
+                    android:textSize="18dp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/user_type"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="#FF5722"
+                    android:text="管理员"
+                    android:textColor="@color/white"
+                    android:textSize="16dp"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
+
+
+            </LinearLayout>
+
+
+            <TextView
+                android:id="@+id/textView14"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left|top"
+                android:layout_marginTop="30dp"
+                android:text="云拍"
+                android:textColor="@color/white"
+                android:textSize="15dp" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/settings"
+            android:layout_width="50dp"
+            android:layout_height="35dp"
+            android:layout_gravity="right"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="10dp"
+            android:gravity="right"
+            android:text="设置"
+            android:textColor="@color/white"
+            android:textSize="17dp" />
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="30dp"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/path_index"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="0"
+                android:textColor="@color/white"
+                android:textSize="13dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="0"
+                android:textColor="@color/white"
+                android:textSize="13dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="0"
+                android:textColor="@color/white"
+                android:textSize="13dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="0"
+                android:textColor="@color/white"
+                android:textSize="13dp" />
+
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="10dp"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="轨迹"
+                android:textColor="@color/white"
+                android:textSize="13dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="脚印"
+                android:textColor="@color/white"
+                android:textSize="13dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="粉丝"
+                android:textColor="@color/white"
+                android:textSize="13dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="关注"
+                android:textColor="@color/white"
+                android:textSize="13dp" />
+
+
+        </LinearLayout>
+
+
+    </FrameLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:weightSum="1">
+
+
+            <LinearLayout
+                android:id="@+id/renzhen"
+                style="@style/top_layout">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp" />
+
+                <TextView
+                    style="@style/usertext"
+                    android:layout_width="1dp"
+                    android:text="  商家入驻" />
+
+                <TextView
+                    android:id="@+id/renzhengxx"
+                    style="@style/usertext"
+                    android:text="未申请"
+                    android:textColor="#999999" />
+
+                <ImageView style="@style/img_arrow" />
+
+
+            </LinearLayout>
+
+            <LinearLayout style="@style/wrap_layout">
+                <!-- 上圆角-->
+                <LinearLayout
+                    android:id="@+id/user_mynotice"
+                    style="@style/top_layout">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp" />
+
+                    <TextView
+                        style="@style/usertext"
+                        android:text="  商家入驻申请" />
+
+                    <ImageView style="@style/img_arrow" />
+                </LinearLayout>
+
+                <View style="@style/bg_line" />-->
+                <!-- 上圆角-->
+                <LinearLayout
+
+                    style="@style/top_layout">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp" />
+
+                    <TextView
+                        style="@style/usertext"
+                        android:text="  区域状态" />
+
+                    <ImageView style="@style/img_arrow" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+
+            <!--            <LinearLayout style="@style/wrap_layout">-->
+            <!--                &lt;!&ndash; 上圆角&ndash;&gt;-->
+            <!--                <LinearLayout-->
+            <!--                    android:id="@+id/user_mynotice"-->
+            <!--                    style="@style/top_layout">-->
+
+            <!--                    <ImageView-->
+            <!--                        android:layout_width="20dp"-->
+            <!--                        android:layout_height="20dp"-->
+            <!--                         />-->
+
+            <!--                    <TextView-->
+            <!--                        style="@style/usertext"-->
+            <!--                        android:text="  我发布的" />-->
+
+            <!--                    <ImageView style="@style/img_arrow" />-->
+            <!--                </LinearLayout>-->
+
+            <!--                &lt;!&ndash; 分割线 &ndash;&gt;-->
+            <!--                <View style="@style/bg_line" />-->
+            <!--                &lt;!&ndash; 无圆角&ndash;&gt;-->
+            <!--                <LinearLayout-->
+            <!--                    android:id="@+id/user_collection"-->
+            <!--                    style="@style/mid_layout">-->
+
+            <!--                    <ImageView-->
+            <!--                        android:layout_width="20dp"-->
+            <!--                        android:layout_height="20dp"-->
+            <!--                         />-->
+
+            <!--                    <TextView-->
+            <!--                        style="@style/usertext"-->
+            <!--                        android:text="  我的收藏" />-->
+
+            <!--                    <ImageView style="@style/img_arrow" />-->
+            <!--                </LinearLayout>-->
+
+            <!--                <View style="@style/bg_line" />-->
+            <!--                &lt;!&ndash; 下圆角&ndash;&gt;-->
+            <!--                <LinearLayout-->
+            <!--                    android:id="@+id/user_circle"-->
+            <!--                    style="@style/bottom_layout">-->
+
+            <!--                    <ImageView-->
+            <!--                        android:layout_width="20dp"-->
+            <!--                        android:layout_height="20dp"-->
+            <!--                       />-->
+
+            <!--                    <TextView-->
+            <!--                        style="@style/usertext"-->
+            <!--                        android:text="  我的圈子" />-->
+
+            <!--                    <ImageView style="@style/img_arrow" />-->
+            <!--                </LinearLayout>-->
+
+
+            <!--            </LinearLayout>-->
+
+
+            <LinearLayout
+                android:id="@+id/server_url"
+                style="@style/wrap_layout"
+                android:visibility="visible"
+                >
+
+
+                <LinearLayout
+                    android:id="@+id/btn_camera_poi"
+                    style="@style/single_layout">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp" />
+
+                    <TextView
+                        style="@style/usertext"
+                        android:text="  摄像机定位获取（Admin）" />
+
+                    <ImageView style="@style/img_arrow" />
+                </LinearLayout>
+
+                <View style="@style/bg_line" />
+
+                <LinearLayout
+                    android:id="@+id/btn_server_url"
+                    style="@style/single_layout">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp" />
+
+                    <TextView
+                        style="@style/usertext"
+                        android:text="  修改服务器地址（Admin）" />
+
+                    <ImageView style="@style/img_arrow" />
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+
+</LinearLayout>
+
+
+
+

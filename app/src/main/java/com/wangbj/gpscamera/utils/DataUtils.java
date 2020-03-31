@@ -12,10 +12,16 @@ import java.util.Date;
 public class DataUtils {
 
 
-    public static String  getCurrentTime(String format){
+    public static String getCurrentTime(String format){
         Date now = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat(format);
         String date = dateFormat.format(now);
         return date;
     }
+
+    public static String getTimestamp(){
+        Long time =  new Date().getTime();
+        return String.valueOf(time);
+    }
+
 }

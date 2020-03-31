@@ -45,12 +45,12 @@ public class LocationForegroundService extends Service {
     private LocationListener locationListener2 = new LocationListener(LocationManager.NETWORK_PROVIDER);
     private GpsListener gpsListener = new GpsListener();
     private LocationManager locationManager;
-    private ACache aCache;
+//    private ACache aCache;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        aCache = ACache.get(this);
+//        aCache = ACache.get(this);
         Log.e(TAG, "--->onCreate");
     }
 
@@ -63,7 +63,6 @@ public class LocationForegroundService extends Service {
     public Location startGps() {
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         Location location = null;
-        //不加这段话会导致下面爆红,（这个俗称版本压制，哈哈哈哈哈哈）
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return null;
         }
@@ -211,18 +210,18 @@ public class LocationForegroundService extends Service {
         @Override
         public void onLocationChanged(Location location) {
 
-            ArrayList arrayList = (ArrayList) aCache.getAsObject("history");
-            if (arrayList != null) {
-                Double[] doubles = {location.getLatitude(), location.getLongitude()};
-                arrayList.add(doubles);
-                aCache.put("history", arrayList);
-            }
-            else{
-                ArrayList arrayList1 = new ArrayList();
-                Double[] doubles = {location.getLatitude(), location.getLongitude()};
-                arrayList1.add(doubles);
-                aCache.put("history", arrayList1);
-            }
+//            ArrayList arrayList = (ArrayList) aCache.getAsObject("history");
+//            if (arrayList != null) {
+//                Double[] doubles = {location.getLatitude(), location.getLongitude()};
+//                arrayList.add(doubles);
+//                aCache.put("history", arrayList);
+//            }
+//            else{
+//                ArrayList arrayList1 = new ArrayList();
+//                Double[] doubles = {location.getLatitude(), location.getLongitude()};
+//                arrayList1.add(doubles);
+//                aCache.put("history", arrayList1);
+//            }
 
 
             Log.e(TAG, "onLocationChanged: " + "当前坐标：" + location.getLatitude() + " : " + location.getLongitude());

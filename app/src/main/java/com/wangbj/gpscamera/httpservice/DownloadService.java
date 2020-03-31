@@ -5,6 +5,7 @@ import android.os.Message;
 import android.util.Log;
 
 import com.wangbj.gpscamera.ui.home.HomeFragment;
+import com.wangbj.gpscamera.utils.ACache;
 
 
 import java.io.File;
@@ -28,10 +29,17 @@ import okhttp3.Response;
 public class DownloadService {
 
 
-    public static void download(String url, final OnDownloadListener listener) {
+    public static void download(ACache aCache, String _url, final String fileName, final String path, final OnDownloadListener listener) {
+        String url = aCache.getAsString("CACHE_SERVER");
+        String sessionId = aCache.getAsString("sessionid");
+
+        if (sessionId == null) {
+            sessionId = " ";
+        }
+
         OkHttpClient okHttpClient = new OkHttpClient();
 
-        Request request = new Request.Builder().url(url).build();
+        Request request = new Request.Builder().url(url + _url).addHeader("cookie", sessionId).build();
         okHttpClient.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -42,20 +50,19 @@ public class DownloadService {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()) {
-                    writeFile(response, listener);
+                    writeFile(response, fileName, path, listener);
                 }
             }
         });
 
     }
 
-    private static void writeFile(Response response, OnDownloadListener listener) {
+    private static void writeFile(Response response, String fileName, String path, OnDownloadListener listener) {
 
         InputStream is = null;
         FileOutputStream fos = null;
         is = response.body().byteStream();
-        String path = Environment.getExternalStorageDirectory().getAbsolutePath();
-        File file = new File(path,"test.zip");
+        File file = new File(path, fileName);
         try {
             fos = new FileOutputStream(file);
             byte[] bytes = new byte[1024];
@@ -67,12 +74,11 @@ public class DownloadService {
             int porSize = 0;
 
             while ((len = is.read(bytes)) != -1) {
-                fos.write(bytes);
+                fos.write(bytes, 0, len); //!!!!!!!!
                 sum += len;
 
                 porSize = (int) ((sum * 1.0f / fileSize) * 100);
                 listener.onDownloading(porSize);
-
             }
             fos.flush();
             listener.onDownloadSuccess(file);
@@ -94,8 +100,6 @@ public class DownloadService {
                 e.printStackTrace();
             }
         }
-
-
 
 
     }
